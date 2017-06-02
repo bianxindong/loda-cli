@@ -24,7 +24,7 @@ var CmdTree = cli.Command{
 			return
 		}
 		for _, t := range MachineInit() {
-			fmt.Println(t)
+			fmt.Println("machine." + t)
 		}
 	},
 }
@@ -85,11 +85,16 @@ func (this *ServerList) getServerList(ns, resType string) []Server {
 	if len(this.Members) == 0 {
 		fmt.Println("No resource found, check your NS.")
 	}
+	m := make(map[string]struct{})
 	for i, s := range this.Members {
 		for _, ip := range strings.Split(s.IP, ",") {
+			if _, ok := m[ip]; ok {
+				continue
+			}
 			if IsIntranet(ip) {
 				s.IP = ip
 				this.Members[i] = s
+				m[ip] = struct{}{}
 				break
 			}
 		}
