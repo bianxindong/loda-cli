@@ -13,7 +13,7 @@ const (
 	Email = ""
 
 	//loda API
-	Server  = "http://registry.test.com"
+	Server  = "http://registry.monitor.ifengidc.com"
 	API_Res = Server + "/api/v1/router/resource?ns=%s&type=%s"
 	API_NS  = Server + "/api/v1/router/ns?format=list"
 )
