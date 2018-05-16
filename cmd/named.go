@@ -100,23 +100,27 @@ func (this *NamedServerList) getServerList(ns, resType string) []NamedServer {
 		return this.Members
 	}
 	m := make(map[string]struct{})
-	for i, s := range this.Members {
+	var res []NamedServer
+	for _, s := range this.Members {
 		for _, ip := range strings.Split(s.IP, ",") {
 			if _, ok := m[ip]; ok {
 				continue
 			}
 			if namedIsIntranet(ip) {
 				s.IP = ip
-				this.Members[i] = s
+				res = append(res, s)
 				m[ip] = struct{}{}
 				break
 			}
 		}
 	}
-	return this.Members
+	return res
 }
 
 func namedIsIntranet(ipStr string) bool {
+	if strings.TrimSpace(ipStr) == "" || strings.Contains(ipStr, ",") {
+		return false
+	}
 	if strings.HasPrefix(ipStr, "10.") {
 		return true
 	}
