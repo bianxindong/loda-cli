@@ -22,19 +22,22 @@ var CmdNamed = cli.Command{
 }
 
 func runNamed(c *cli.Context) {
-	header := `$TTL	60 ; 24 hours could have been written as 24h or 1D
+	header := `$ORIGIN .
+$TTL 600	; 10 minutes
+loda	IN SOA	ns1.loda ns.ifeng.com. (
+				%s ; serial
+				600        ; refresh (10 minutes)
+				600        ; retry (10 minutes)
+				86400      ; expire (1 day)
+				60         ; minimum (1 minute)
+				)
+			NS	ns1.loda.
+			NS	ns2.loda.
 $ORIGIN loda.
-; line below expands to: localhost 1D IN SOA localhost root.localhost
-@  1D  IN	 SOA @	hostmaster (
-					%s ; serial
-					3H ; refresh
-					15 ; retry
-					1w ; expire
-					3h ; minimum
-					)
+$TTL 60	; 1 minutes
+ns1			A	10.80.40.157
+ns2			A	10.90.1.225
 
-
-			NS		ns1
 `
 	t := time.Now()
 	ts := t.Format("2006010215")
@@ -45,7 +48,7 @@ $ORIGIN loda.
 	for _, ns := range nsList.AllNameSpaces() {
 		var serverList NamedServerList
 		for _, server := range serverList.getServerList(ns, "machine") {
-			body = fmt.Sprintf("%s%s		IN	A 	%s\n", body, strings.TrimSuffix(ns, ".loda"), server.IP)
+			body = fmt.Sprintf("%s%s		A 	%s\n", body, strings.TrimSuffix(ns, ".loda"), server.IP)
 		}
 	}
 	if len(body) < 92484 {
