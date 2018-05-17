@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/lodastack/loda-cli/setting"
 	"github.com/oiooj/cli"
@@ -25,7 +24,7 @@ func runNamed(c *cli.Context) {
 	header := `$ORIGIN .
 $TTL 600	; 10 minutes
 loda	IN SOA	ns1.loda ns.ifeng.com. (
-				%s ; serial
+				2006010215 ; serial
 				600        ; refresh (10 minutes)
 				600        ; retry (10 minutes)
 				86400      ; expire (1 day)
@@ -39,9 +38,6 @@ ns1			A	10.80.40.157
 ns2			A	10.90.1.225
 
 `
-	t := time.Now()
-	ts := t.Format("2006010215")
-	header = fmt.Sprintf(header, ts)
 	os.Remove("./loda.zone")
 	var body string
 	var nsList NameSpaceList
