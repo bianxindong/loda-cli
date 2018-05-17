@@ -8,8 +8,11 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/lodastack/loda-cli/setting"
+	"github.com/lodastack/models"
+	"github.com/lodastack/sdk-go"
 	"github.com/oiooj/cli"
 )
 
@@ -43,8 +46,7 @@ ns2			A	10.90.1.225
 	var nsList NameSpaceList
 	ms, err := nsList.AllNameSpaces()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		handlerErr(err)
 	}
 	for _, ns := range ms {
 		var serverList NamedServerList
@@ -53,25 +55,28 @@ ns2			A	10.90.1.225
 		}
 	}
 	if len(body) < 92484 {
-		fmt.Println("body broken")
-		os.Exit(1)
+		handlerErr(fmt.Errorf("%s", "body broken"))
 	}
 	f, err := os.Create("./loda.zone")
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		handlerErr(err)
 	}
 	w := bufio.NewWriter(f)
 	_, err = w.WriteString(header + body)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		handlerErr(err)
 	}
 	err = w.Flush()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		handlerErr(err)
 	}
+	Send(1)
+}
+
+func handlerErr(err error) {
+	Send(0)
+	fmt.Println(err)
+	os.Exit(1)
 }
 
 type NamedServerList struct {
@@ -91,14 +96,12 @@ func (this *NamedServerList) getServerList(ns, resType string) []NamedServer {
 	url := fmt.Sprintf(setting.API_Res, ns, resType)
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println("Get from loda error: ", err)
-		os.Exit(1)
+		handlerErr(err)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Read from HTTP error: ", err)
-		os.Exit(1)
+		handlerErr(err)
 	}
 	json.Unmarshal(body, &this)
 	if len(this.Members) == 0 {
@@ -130,4 +133,17 @@ func namedIsIntranet(ipStr string) bool {
 		return true
 	}
 	return false
+}
+
+func Send(value float64) error {
+	m := models.Metric{
+		Name:      "named.sync",
+		Timestamp: time.Now().Unix(),
+		Value:     value,
+	}
+	data, err := json.Marshal([]models.Metric{m})
+	if err != nil {
+		return err
+	}
+	return sdk.Post("registry.monitor.loda", data)
 }
