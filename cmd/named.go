@@ -45,7 +45,12 @@ ns2			A	10.90.1.225
 	os.Remove("./loda.zone")
 	var body string
 	var nsList NameSpaceList
-	for _, ns := range nsList.AllNameSpaces() {
+	ms, err := nsList.AllNameSpaces()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	for _, ns := range ms {
 		var serverList NamedServerList
 		for _, server := range serverList.getServerList(ns, "machine") {
 			body = fmt.Sprintf("%s%s		A 	%s\n", body, strings.TrimSuffix(ns, ".loda"), server.IP)
@@ -66,7 +71,11 @@ ns2			A	10.90.1.225
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	w.Flush()
+	err = w.Flush()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 type NamedServerList struct {

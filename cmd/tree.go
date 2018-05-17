@@ -38,7 +38,12 @@ func runTree(c *cli.Context) {
 		}
 	} else {
 		var nsList NameSpaceList
-		for _, ns := range nsList.AllNameSpaces() {
+		ms, err := nsList.AllNameSpaces()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		for _, ns := range ms {
 			fmt.Println(ns)
 		}
 	}
@@ -86,23 +91,28 @@ func (this *ServerList) getServerList(ns, resType string) []Server {
 		fmt.Println("No resource found, check your NS.")
 	}
 	m := make(map[string]struct{})
-	for i, s := range this.Members {
+	var res []Server
+	for _, s := range this.Members {
 		for _, ip := range strings.Split(s.IP, ",") {
 			if _, ok := m[ip]; ok {
 				continue
 			}
 			if IsIntranet(ip) {
 				s.IP = ip
-				this.Members[i] = s
+				res = append(res, s)
 				m[ip] = struct{}{}
 				break
 			}
 		}
 	}
-	return this.Members
+	return res
 }
 
 func IsIntranet(ipStr string) bool {
+	if strings.TrimSpace(ipStr) == "" || strings.Contains(ipStr, ",") {
+		return false
+	}
+
 	if strings.HasPrefix(ipStr, "10.") {
 		return true
 	}
