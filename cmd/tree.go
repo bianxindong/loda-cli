@@ -13,6 +13,7 @@ import (
 	"github.com/oiooj/cli"
 )
 
+// CmdTree cmd
 var CmdTree = cli.Command{
 	Name:        "tree",
 	Usage:       "列出指定节点下的资源",
@@ -49,11 +50,13 @@ func runTree(c *cli.Context) {
 	}
 }
 
+// ServerList struct
 type ServerList struct {
 	Members   []Server `json:"data"`
 	NameSpace string
 }
 
+// Server struct
 type Server struct {
 	Hostname   string `json:"hostname"`
 	IP         string `json:"ip"`
@@ -62,18 +65,18 @@ type Server struct {
 	Version    string `json:"version"`
 }
 
-func (this *ServerList) think(ns string) []Server {
+func (sl *ServerList) think(ns string) []Server {
 	arr := strings.SplitN(ns, ".", 2)
 	switch strings.ToLower(arr[0]) {
 	case "machine":
-		return this.getServerList(arr[1], arr[0])
+		return sl.getServerList(arr[1], arr[0])
 	default:
 		fmt.Println("Dont support this resource type. Try: mechine.xxx.loda")
 	}
-	return this.Members
+	return sl.Members
 }
 
-func (this *ServerList) getServerList(ns, resType string) []Server {
+func (sl *ServerList) getServerList(ns, resType string) []Server {
 	url := fmt.Sprintf(setting.API_Res, ns, resType)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -86,13 +89,13 @@ func (this *ServerList) getServerList(ns, resType string) []Server {
 		fmt.Println("Read from HTTP error: ", err)
 		os.Exit(1)
 	}
-	json.Unmarshal(body, &this)
-	if len(this.Members) == 0 {
+	json.Unmarshal(body, &sl)
+	if len(sl.Members) == 0 {
 		fmt.Println("No resource found, check your NS.")
 	}
 	m := make(map[string]struct{})
 	var res []Server
-	for _, s := range this.Members {
+	for _, s := range sl.Members {
 		for _, ip := range strings.Split(s.IP, ",") {
 			if _, ok := m[ip]; ok {
 				continue
@@ -108,6 +111,7 @@ func (this *ServerList) getServerList(ns, resType string) []Server {
 	return res
 }
 
+// IsIntranet checks weather ipstr is a intranet IP
 func IsIntranet(ipStr string) bool {
 	if strings.TrimSpace(ipStr) == "" || strings.Contains(ipStr, ",") {
 		return false

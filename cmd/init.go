@@ -11,6 +11,7 @@ import (
 	"github.com/lodastack/loda-cli/setting"
 )
 
+// MachineInit init machine
 func MachineInit() []string {
 	var nsList NameSpaceList
 	res, err := nsList.AllNameSpaces()
@@ -21,29 +22,31 @@ func MachineInit() []string {
 	return res
 }
 
+// NameSpaceList struct
 type NameSpaceList struct {
 	Code    int      `json:"httpstatus"`
 	Members []string `json:"data"`
 }
 
-func (this NameSpaceList) AllNameSpaces() ([]string, error) {
+// AllNameSpaces returns all ns
+func (nl NameSpaceList) AllNameSpaces() ([]string, error) {
 	resp, err := http.Get(setting.API_NS)
 	if err != nil {
-		return this.Members, err
+		return nl.Members, err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return this.Members, err
+		return nl.Members, err
 	}
-	err = json.Unmarshal(body, &this)
+	err = json.Unmarshal(body, &nl)
 	if err != nil {
-		return this.Members, err
+		return nl.Members, err
 	}
-	if len(this.Members) == 0 {
+	if len(nl.Members) == 0 {
 		fmt.Println("No NameSpace found!")
-		return this.Members, nil
+		return nl.Members, nil
 	}
-	sort.Strings(this.Members)
-	return this.Members, nil
+	sort.Strings(nl.Members)
+	return nl.Members, nil
 }

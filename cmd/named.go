@@ -16,6 +16,7 @@ import (
 	"github.com/oiooj/cli"
 )
 
+// CmdNamed exports named config
 var CmdNamed = cli.Command{
 	Name:        "named",
 	Usage:       "named config",
@@ -48,10 +49,14 @@ ns2			A	10.90.1.225
 	if err != nil {
 		handlerErr(err)
 	}
+	var count float64
 	for _, ns := range ms {
 		var serverList NamedServerList
 		for _, server := range serverList.getServerList(ns, "machine") {
-			body = fmt.Sprintf("%s%s		A 	%s\n", body, strings.TrimSuffix(ns, ".loda"), server.IP)
+			if server.Status != "offline" {
+				body = fmt.Sprintf("%s%s		A 	%s\n", body, strings.TrimSuffix(ns, ".loda"), server.IP)
+				count++
+			}
 		}
 	}
 	if len(body) < 92484 {
@@ -70,20 +75,23 @@ ns2			A	10.90.1.225
 	if err != nil {
 		handlerErr(err)
 	}
-	Send(1)
+	Send("named.sync", 1)
+	Send("named.count", count)
 }
 
 func handlerErr(err error) {
-	Send(0)
+	Send("named.sync", 0)
 	fmt.Println(err)
 	os.Exit(1)
 }
 
+//NamedServerList struct
 type NamedServerList struct {
 	Members   []NamedServer `json:"data"`
 	NameSpace string
 }
 
+// NamedServer struct
 type NamedServer struct {
 	Hostname   string `json:"hostname"`
 	IP         string `json:"ip"`
@@ -92,7 +100,7 @@ type NamedServer struct {
 	Version    string `json:"version"`
 }
 
-func (this *NamedServerList) getServerList(ns, resType string) []NamedServer {
+func (nl *NamedServerList) getServerList(ns, resType string) []NamedServer {
 	url := fmt.Sprintf(setting.API_Res, ns, resType)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -103,13 +111,13 @@ func (this *NamedServerList) getServerList(ns, resType string) []NamedServer {
 	if err != nil {
 		handlerErr(err)
 	}
-	json.Unmarshal(body, &this)
-	if len(this.Members) == 0 {
-		return this.Members
+	json.Unmarshal(body, &nl)
+	if len(nl.Members) == 0 {
+		return nl.Members
 	}
 	m := make(map[string]struct{})
 	var res []NamedServer
-	for _, s := range this.Members {
+	for _, s := range nl.Members {
 		for _, ip := range strings.Split(s.IP, ",") {
 			if _, ok := m[ip]; ok {
 				continue
@@ -135,9 +143,10 @@ func namedIsIntranet(ipStr string) bool {
 	return false
 }
 
-func Send(value float64) error {
+// Send sends metric to monitor system
+func Send(name string, value float64) error {
 	m := models.Metric{
-		Name:      "named.sync",
+		Name:      name,
 		Timestamp: time.Now().Unix(),
 		Value:     value,
 	}

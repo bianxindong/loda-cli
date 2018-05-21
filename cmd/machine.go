@@ -8,6 +8,7 @@ import (
 	"github.com/oiooj/cli"
 )
 
+// CmdMachine cmd
 var CmdMachine = cli.Command{
 	Name:        "machine",
 	Usage:       "搜索机器",
