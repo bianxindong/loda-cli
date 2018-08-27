@@ -58,6 +58,7 @@ type ServerList struct {
 
 // Server struct
 type Server struct {
+	NS         string `json:"-"`
 	Hostname   string `json:"hostname"`
 	IP         string `json:"ip"`
 	LastReport string `json:"lastReport"`

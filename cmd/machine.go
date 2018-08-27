@@ -21,12 +21,26 @@ func runMachine(c *cli.Context) {
 		hostname := c.Args()[0]
 		var serverList ServerList
 		for _, server := range serverList.getServerList("loda", "machine") {
+			if server.Hostname == "" {
+				continue
+			}
 			if matched, err := regexp.MatchString(hostname, server.Hostname); matched {
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
 				}
-				fmt.Println(server.IP)
+				fmt.Printf("%s %s\n", server.Hostname, server.IP)
+			}
+
+			if server.IP == "" {
+				continue
+			}
+			if matched, err := regexp.MatchString(hostname, server.IP); matched {
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+				fmt.Printf("%s %s\n", server.Hostname, server.IP)
 			}
 		}
 
