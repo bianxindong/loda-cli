@@ -72,7 +72,7 @@ func (sl *ServerList) think(ns string) []Server {
 	case "machine":
 		return sl.getServerList(arr[1], arr[0])
 	default:
-		fmt.Println("Dont support this resource type. Try: mechine.xxx.loda")
+		fmt.Println("Dont support this resource type. Try: machine.xxx.loda")
 	}
 	return sl.Members
 }
