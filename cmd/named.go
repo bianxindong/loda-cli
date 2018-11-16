@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lodastack/loda-cli/setting"
 	"github.com/lodastack/models"
 	"github.com/lodastack/sdk-go"
 	"github.com/oiooj/cli"
+	"github.com/oiooj/loda-cli/setting"
 )
 
 // CmdNamed exports named config

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/lodastack/loda-cli/cmd"
-	"github.com/lodastack/loda-cli/setting"
 	"github.com/oiooj/cli"
+	"github.com/oiooj/loda-cli/cmd"
+	"github.com/oiooj/loda-cli/flag"
+	"github.com/oiooj/loda-cli/setting"
 )
 
 func main() {
@@ -23,7 +25,17 @@ func main() {
 		cmd.CmdMachine,
 		cmd.CmdNamed,
 	}
-
-	app.Flags = append(app.Flags, []cli.Flag{}...)
+	app.Flags = []cli.Flag{
+		flag.FlagFile,
+		flag.FlagOutput,
+	}
+	app.Action = func(c *cli.Context) {
+		if len(c.Args()) != 0 {
+			fmt.Println("loda-cli -h查看使用用法")
+		} else {
+			output := flag.RunOutput(c)
+			flag.RunFile(c, output)
+		}
+	}
 	app.Run(os.Args)
 }

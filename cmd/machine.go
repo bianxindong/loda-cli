@@ -20,7 +20,7 @@ func runMachine(c *cli.Context) {
 	if len(c.Args()) > 0 {
 		hostname := c.Args()[0]
 		var serverList ServerList
-		for _, server := range serverList.getServerList("loda", "machine") {
+		for _, server := range serverList.GetServerList("loda", "machine") {
 			if server.Hostname == "" {
 				continue
 			}
@@ -29,7 +29,7 @@ func runMachine(c *cli.Context) {
 					fmt.Println(err)
 					os.Exit(1)
 				}
-				fmt.Printf("%s %s\n", server.Hostname, server.IP)
+				fmt.Printf("%s %s\n", server.IP, server.Hostname)
 			}
 
 			if server.IP == "" {
@@ -40,10 +40,9 @@ func runMachine(c *cli.Context) {
 					fmt.Println(err)
 					os.Exit(1)
 				}
-				fmt.Printf("%s %s\n", server.Hostname, server.IP)
+				fmt.Printf("%s %s\n", server.IP, server.Hostname)
 			}
 		}
-
 	} else {
 		fmt.Println("Input anything plz")
 	}

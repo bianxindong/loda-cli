@@ -9,15 +9,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lodastack/loda-cli/setting"
 	"github.com/oiooj/cli"
+	"github.com/oiooj/loda-cli/setting"
 )
 
 // CmdTree cmd
 var CmdTree = cli.Command{
 	Name:        "tree",
 	Usage:       "列出指定节点下的资源",
-	Description: "列出指定节点下的资源",
+	Description: "machine.xxx.loda(标准域名格式)/rmachine.loda.xxx(树形格式)",
 	Action:      runTree,
 	BashComplete: func(c *cli.Context) {
 		// This will complete if no args are passed
@@ -27,6 +27,9 @@ var CmdTree = cli.Command{
 		for _, t := range MachineInit() {
 			fmt.Println("machine." + t)
 		}
+		for _, t := range UMachineInit() {
+			fmt.Println("rmachine." + t)
+		}
 	},
 }
 
@@ -35,7 +38,7 @@ func runTree(c *cli.Context) {
 		ns := c.Args()[0]
 		var serverList ServerList
 		for _, server := range serverList.think(ns) {
-			fmt.Println(server.IP)
+			fmt.Printf("%-15s %s\n", server.IP, server.Hostname)
 		}
 	} else {
 		var nsList NameSpaceList
@@ -70,14 +73,16 @@ func (sl *ServerList) think(ns string) []Server {
 	arr := strings.SplitN(ns, ".", 2)
 	switch strings.ToLower(arr[0]) {
 	case "machine":
-		return sl.getServerList(arr[1], arr[0])
+		return sl.GetServerList(arr[1], arr[0])
+	case "rmachine":
+		return sl.GetServerList(reverse(arr[1]), "machine")
 	default:
-		fmt.Println("Dont support this resource type. Try: machine.xxx.loda")
+		fmt.Println("Dont support this resource type. Try: machine.xxx.loda/rmachine.loda.xxx")
 	}
 	return sl.Members
 }
 
-func (sl *ServerList) getServerList(ns, resType string) []Server {
+func (sl *ServerList) GetServerList(ns, resType string) []Server {
 	url := fmt.Sprintf(setting.API_Res, ns, resType)
 	resp, err := http.Get(url)
 	if err != nil {
