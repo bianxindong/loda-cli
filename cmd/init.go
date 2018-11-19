@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -80,6 +81,9 @@ func (nl NameSpaceList) AllNameSpaces() ([]string, error) {
 }
 
 func substr(s string, pos, length int) string {
+	if length <= 0 {
+		return "error"
+	}
 	runes := []rune(s)
 	l := pos + length
 	if l > len(runes) {
@@ -96,8 +100,14 @@ func GetCurrentDirectory() string {
 	return strings.Replace(dir, "\\", "/", -1)
 }
 
-func GetParentDirectory(dirctory string) string {
-	return substr(dirctory, 0, strings.LastIndex(dirctory, "/"))
+func GetParentDirectory(dirctory string) (string, error) {
+	dirctory = strings.Replace(dirctory, "\\", "/", -1)
+	parent := substr(dirctory, 0, strings.LastIndex(dirctory, "/"))
+	if parent == "error" {
+		return "", errors.New("get parentDirectory error")
+	} else {
+		return parent, nil
+	}
 }
 
 //PathExist checks the pathfile is or isn't exist

@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/oiooj/cli"
 	"github.com/oiooj/loda-cli/setting"
+	"github.com/urfave/cli"
 )
 
 // CmdTree cmd
@@ -73,16 +73,16 @@ func (sl *ServerList) think(ns string) []Server {
 	arr := strings.SplitN(ns, ".", 2)
 	switch strings.ToLower(arr[0]) {
 	case "machine":
-		return sl.GetServerList(arr[1], arr[0])
+		return sl.getServerList(arr[1], arr[0])
 	case "rmachine":
-		return sl.GetServerList(reverse(arr[1]), "machine")
+		return sl.getServerList(reverse(arr[1]), "machine")
 	default:
 		fmt.Println("Dont support this resource type. Try: machine.xxx.loda/rmachine.loda.xxx")
 	}
 	return sl.Members
 }
 
-func (sl *ServerList) GetServerList(ns, resType string) []Server {
+func (sl *ServerList) getServerList(ns, resType string) []Server {
 	url := fmt.Sprintf(setting.API_Res, ns, resType)
 	resp, err := http.Get(url)
 	if err != nil {

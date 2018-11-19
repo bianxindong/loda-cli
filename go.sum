@@ -2,5 +2,5 @@ github.com/lodastack/models v0.0.0-20171124042023-a657bc0c06c6 h1:HKZPoNdKD1g7nf
 github.com/lodastack/models v0.0.0-20171124042023-a657bc0c06c6/go.mod h1:6DwdhCS6s4P+9M6rjiNshSdu7T8KqHJcTHnrQVfn1+U=
 github.com/lodastack/sdk-go v0.0.0-20170303095045-58b4c40298f6 h1:PH4qQ3vh0GlbBmFHKktUPePeEyeSyHe/yE6Nx0b9gkk=
 github.com/lodastack/sdk-go v0.0.0-20170303095045-58b4c40298f6/go.mod h1:rnIUskBa/l7o5CCLDAJLa4W2G0I+F11xuG9PzCRPVZI=
-github.com/oiooj/cli v1.2.0 h1:mo4YHWa5xNIQ6j4jpMpp+uZUQKuyTimK9RhcsErxw4Q=
-github.com/oiooj/cli v1.2.0/go.mod h1:/x5O7x/zoTICKcZLi4eNcNNLcYaoMV63uXCsbDBQCXE=
+github.com/urfave/cli v1.20.0 h1:fDqGv3UG/4jbVl/QkFwEdddtEDjh/5Ov6X+0B/3bPaw=
+github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=

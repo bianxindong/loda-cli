@@ -12,8 +12,8 @@ import (
 
 	"github.com/lodastack/models"
 	"github.com/lodastack/sdk-go"
-	"github.com/oiooj/cli"
 	"github.com/oiooj/loda-cli/setting"
+	"github.com/urfave/cli"
 )
 
 // CmdNamed exports named config
